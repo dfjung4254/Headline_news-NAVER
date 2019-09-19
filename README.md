@@ -22,12 +22,16 @@ $ npm i headline-news-naver
 
 
 
-## Testing
+## Testing Demo
+
+- examples 디렉토리에서 모듈을 설치 및 실행 
 
 ```
 $ git clone https://github.com/dfjung4254/headline-news-naver.git
 $ cd headline-news-naver
-$ node ./examples/test.js
+$ cd examples
+$ npm i headline-news-naver
+$ node test.js
 ```
 
 
