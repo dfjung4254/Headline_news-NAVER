@@ -1,15 +1,23 @@
-# Headline_news-NAVER
+# headline-news-naver
+
 ***To test web crawling in nodejs using cheerio library***
 
 
 
+
+
 ## About
-#### This module extracts the top five news metadata from NAVER headlines.
+
+#### This NPM module extracts the top five news metadata from NAVER headlines.
+
+네이버 헤드라인 뉴스 상위 5개 기사 메타데이터를 크롤링해주는 NPM 모듈입니다.
 
 
 
-## Usage
-추후 작성
+## Install
+
+
+
 
 
 
@@ -23,3 +31,6 @@
 
 - NAME  : 정근화(Jung keun-hwa)
 - EMAIL : rmsghk4254@naver.com
+
+
+
