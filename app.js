@@ -1,6 +1,7 @@
 const request = require("request");
 const cheerio = require("cheerio");
 const iconv = require('iconv-lite');
+const request_promise = require('request-promise');
 
 /*
 
@@ -21,7 +22,12 @@ const iconv = require('iconv-lite');
     소속   : Hongik University
 
 */
+
 async function getNews(uri_naver) {
+
+    var newsList = [];
+    var $;
+    var $newsList;
 
     var requestOptions = {
         method: "GET",
@@ -41,70 +47,92 @@ async function getNews(uri_naver) {
         encoding: null
     }
 
-    request(requestOptions, function (err, res, body) {
-
-        /*
-    
-            request 모듈을 통해 해당 uri의 html 소스를 body 로 가져온다.
-    
-        */
-
-        /* Buffer 로 body 정제 */
-        var htmlDocs = Buffer.from(body);
-
-        /* 디코딩 - euckr to utf8 */
-        var decodedDocs = iconv.decode(htmlDocs, 'euc-kr');
-
-        /* cheerio 모듈을 활용하여 해당 웹페이지를 $로 로드 */
-        const $ = cheerio.load(decodedDocs, {
-            /* decodeEntities를 사용하지 않아야 텍스트가 제대로 넘어온다. */
-            decodeEntities: false
-        });
-
-        /* 헤드라인뉴스 부분 접근 */
-        const $newsList = $('ul[class=hdline_article_list]').children();
-
-        /* 헤드라인 뉴스 5개 for 문 통해 개별 접근 */
-        $newsList.each(async function (idx, element) {
-            var tp = $(this).children('div[class=hdline_article_tit]');
+    await request_promise(requestOptions)
+        .then(function (body) {
 
             /*
-            
-                해당 Uri 로 다시 들어가 각 뉴스의 이미지와 제목, 요약, 내용을 가져온다.
-            
+
+                request 모듈을 통해 해당 uri의 html 소스를 body 로 가져온다.
+
             */
-            var reqUri = tp.find('a').attr('href');
-            var reqOpt = {
-                method: "GET",
-                uri: uri_naver + reqUri,
-                headers: {
-                    "User-Agent": "Mozilla/5.0"
-                },
-                encoding: null
-            }
 
-            await request(reqOpt, function (err, res, sub_body) {
-                var sub_htmlDocs = Buffer.from(sub_body);
-                var sub_decodedDocs = iconv.decode(sub_htmlDocs, 'euc-kr');
-                const $sub = cheerio.load(sub_decodedDocs, {
-                    decodeEntities : false
-                });
+            /* Buffer 로 body 정제 */
+            var htmlDocs = Buffer.from(body);
 
-                var _title = $sub("meta[property='og:title']").attr('content');
-                var _summary = $sub("meta[property='og:description']").attr('content');
-                var _contents = $sub('div[class=_article_body_contents]').text();
-                var _imageUrl = $sub("meta[property='og:image']").attr('content');
+            /* 디코딩 - euckr to utf8 */
+            var decodedDocs = iconv.decode(htmlDocs, 'euc-kr');
 
-                console.log("------------------------------------");
-                console.log(_title);
-                console.log(_summary);
-                console.log(_contents);
-                console.log(_imageUrl);
-                console.log("------------------------------------");
-
+            /* cheerio 모듈을 활용하여 해당 웹페이지를 $로 로드 */
+            $ = cheerio.load(decodedDocs, {
+                /* decodeEntities를 사용하지 않아야 텍스트가 제대로 넘어온다. */
+                decodeEntities: false
             });
+
+            /* 헤드라인뉴스 부분 접근 */
+            $newsList = $('ul[class=hdline_article_list]').children();
+
+        });
+
+    var reqOpts = [];
+
+    $newsList.each(function (idx, element) {
+
+        var tp = $(this).children('div[class=hdline_article_tit]');
+        var newsObj;
+
+        /*
+
+            해당 Uri 로 다시 들어가 각 뉴스의 이미지와 제목, 요약, 내용을 가져온다.
+
+        */
+        var reqUri = tp.find('a').attr('href');
+        var reqOpt = {
+            method: "GET",
+            uri: uri_naver + reqUri,
+            headers: {
+                "User-Agent": "Mozilla/5.0"
+            },
+            encoding: null
+        }
+
+        reqOpts.push(reqOpt);
+
+    });
+
+    /* 각 헤드라인 뉴스기사의 Uri를 병렬적으로 크롤링 한다 */
+    var idx = 0;
+    const requestLoopAsync = reqOpts.map(async function (thisReqOpt) {
+        await request_promise(thisReqOpt).then(function (sub_body) {
+            var sub_htmlDocs = Buffer.from(sub_body);
+            var sub_decodedDocs = iconv.decode(sub_htmlDocs, 'euc-kr');
+            const $sub = cheerio.load(sub_decodedDocs, {
+                decodeEntities: false
+            });
+
+            var _title = $sub("meta[property='og:title']").attr('content').trim();
+            var _summary = $sub("meta[property='og:description']").attr('content').trim();
+            var _contents = $sub('div[class=_article_body_contents]').text().trim();
+            var _imageUrl = $sub("meta[property='og:image']").attr('content').trim();
+
+            var newsObj = {
+                title: _title,
+                summary: _summary,
+                contents: _contents,
+                imageUrl: _imageUrl
+            };
+            newsList.push(newsObj);
         });
     });
+
+    /* 위의 for문의 병렬 처리가 완료될 때 까지 기다린다 */
+    await Promise.all(requestLoopAsync);
+
+    var retObj = {
+        news_array: newsList
+    }
+    
 }
+
+
 
 getNews("https://news.naver.com");
