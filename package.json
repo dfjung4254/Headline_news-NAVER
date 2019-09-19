@@ -1,14 +1,27 @@
 {
-  "name": "Headline_news-NAVER",
+  "name": "headline-news-naver",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "This extracts the top five news metadata from NAVER headlines.",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "naver",
+    "news",
+    "crawling",
+    "headline",
+    "headlinenews"
+  ],
+  "author": {
+    "name" : "Jung Keun-hwa",
+    "email" : "rmsghk4254@naver.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dfjung4254/Headline_news-NAVER"
+  },
+  "license": "MIT",
   "dependencies": {
     "axios": "^0.19.0",
     "cheerio": "^1.0.0-rc.3",

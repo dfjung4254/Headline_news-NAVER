@@ -1,4 +1,3 @@
-const request = require("request");
 const cheerio = require("cheerio");
 const iconv = require('iconv-lite');
 const request_promise = require('request-promise');
@@ -23,8 +22,9 @@ const request_promise = require('request-promise');
 
 */
 
-async function getNews(uri_naver) {
+module.exports = async function getNews() {
 
+    const uri_naver = "https://news.naver.com";
     var newsList = [];
     var $;
     var $newsList;
@@ -127,12 +127,11 @@ async function getNews(uri_naver) {
     /* 위의 for문의 병렬 처리가 완료될 때 까지 기다린다 */
     await Promise.all(requestLoopAsync);
 
+    /* 리턴할 객체 설정 */
     var retObj = {
         news_array: newsList
     }
-    
+
+    return retObj;
+
 }
-
-
-
-getNews("https://news.naver.com");
