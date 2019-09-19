@@ -22,7 +22,7 @@ const request_promise = require('request-promise');
 
 */
 
-module.exports = async function getNews() {
+exports.getNaverNews = async () => {
 
     const uri_naver = "https://news.naver.com";
     var newsList = [];

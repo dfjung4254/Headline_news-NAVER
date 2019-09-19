@@ -1,6 +1,6 @@
 {
   "name": "headline-news-naver",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "This extracts the top five news metadata from NAVER headlines.",
   "main": "app.js",
   "scripts": {
