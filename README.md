@@ -50,6 +50,7 @@ async function test() {
 
     arr.forEach(thisNews => {
 
+        console.log(thisNews['url']);
         console.log(thisNews['title']);
         console.log(thisNews['summary']);
         console.log(thisNews['contents']);

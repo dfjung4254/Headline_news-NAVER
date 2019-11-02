@@ -8,6 +8,7 @@ var headline = require('headline-news-naver');
 
             {
                 // 뉴스1 Obj
+                "url"       : "뉴스1 url",
                 "title"     : "뉴스1 제목",
                 "summary"   : "뉴스1 요약",
                 "contents"  : "뉴스1 내용",
@@ -34,6 +35,7 @@ async function test() {
     arr.forEach(thisNews => {
 
         console.log("\n\n--------------------NAVER HEADLINE NEWS NO."+idx++ + "----------------------------------\n\n");
+        console.log("[URL] \n" + thisNews['url'] + "\n\n");
         console.log("[TITLE] \n" + thisNews['title'] + "\n\n");
         console.log("[SUMMARY] \n" + thisNews['summary'] + "\n\n");
         console.log("[CONTENTS] \n" + thisNews['contents'] + "\n\n");
